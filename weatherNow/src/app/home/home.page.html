@@ -1,0 +1,110 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title class="header-title">Weather<span class="gradient">Now!</span></ion-title>
+    <ion-buttons slot="end">
+      <ion-button [(ngModel)]="paletteToggle" (click)="toggleChange()">
+        <ion-icon name="sunny"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-progress-bar type="indeterminate" *ngIf="loading"></ion-progress-bar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="home-page sky">
+    <div *ngIf="!weatherData" class="welcome-page">
+      <h1 class="title">Bienvenue sur Weather<span class="gradient">Now!</span></h1>
+      <p>Consultez les prévisions météo de votre ville préférée en un clic !</p>
+      <button (click)="searching = !searching">Click</button>
+      <div class="search-bar">
+        <input type="text" placeholder="Entrez le nom d'une ville" [(ngModel)]="city"
+          (keydown.enter)="searchWeather()" />
+        <button (click)="searchWeather()" [disabled]="searching" class="search-button">
+          <span *ngIf="!searching">Rechercher</span>
+          <span *ngIf="searching" class="spinner">
+            <ion-spinner name="crescent"></ion-spinner>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="weatherData" class="weather-container">
+      <div class="weather-title">
+        <img [src]="'https://openweathermap.org/img/wn/' + weatherData.icon + '@4x.png'" [alt]="weatherData.description"
+          class="weather-icon" />
+        <span>
+          Météo pour {{ weatherData.name }}, {{ weatherData.country }}
+        </span>
+      </div>
+
+      <div class="temperature">
+        <ion-icon name="thermometer-outline"></ion-icon>
+        <span>Température actuelle : {{ weatherData.temperature | number:
+          '1.0-0' }}°{{unit === 'metric' ? 'C' : 'F'}}</span>
+      </div>
+      <p class="feels-like">
+        Ressenti : {{ weatherData.feels_like | number: '1.0-0' }}°{{unit === 'metric' ? 'C' : 'F'}}
+      </p>
+
+      <div class="details">
+        <div class="card">
+          <div class="label">Pluie (1h)</div>
+          <div class="detail">
+            <ion-icon name="rainy-outline"></ion-icon>
+            <span>{{ weatherData.rain }} mm</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="label">Vent</div>
+          <div class="detail">
+            <ion-icon name="leaf-outline"></ion-icon>
+            <span>{{ weatherData.wind.speed }} {{unit === 'metric' ?
+              'm/s' : 'mph'}}, direction {{ weatherData.wind.deg }}°</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="label">Couverture nuageuse</div>
+          <div class="detail">
+            <ion-icon name="cloud-outline"></ion-icon>
+            <span>{{ weatherData.clouds }}%</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="label">Humidité</div>
+          <div class="detail">
+            <ion-icon name="water-outline"></ion-icon>
+            <span>{{ weatherData.humidity }}%</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="label">Visibilité</div>
+          <div class="detail">
+            <ion-icon name="eye-outline"></ion-icon>
+            <span>{{ weatherData.visibility / 1000 }} km</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="label">Pression</div>
+          <div class="detail">
+            <ion-icon name="speedometer-outline"></ion-icon>
+            <span>{{ weatherData.pressure }} hPa</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sunrise-sunset">
+        <p><ion-icon name="sunny-outline"></ion-icon>Lever du soleil : {{ weatherData.sunrise * 1000 | date: 'HH:mm' }}
+          Coucher du soleil : {{ weatherData.sunset * 1000 | date: 'HH:mm' }}</p>
+      </div>
+
+      <button class="toggle-unit" (click)="toggleUnit()">Basculer en degrés {{ unit === 'metric' ? 'Fahrenheit (F°)' :
+        'Celsius (C°)'
+        }}</button>
+    </div>
+
+    <div *ngIf="errorMessage" class="error">
+      <p>{{ errorMessage }}</p>
+    </div>
+  </div>
+
+</ion-content>
