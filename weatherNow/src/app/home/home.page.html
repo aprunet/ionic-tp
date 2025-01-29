@@ -1,6 +1,12 @@
 <ion-header>
   <ion-toolbar>
     <ion-title class="header-title">Weather<span class="gradient">Now!</span></ion-title>
+    <ion-buttons slot="start">
+      <ion-button *ngIf="weatherData" (click)="goBackToHomePage()">
+        <ion-icon name="arrow-back"></ion-icon>
+        <ion-label>Retour</ion-label>
+      </ion-button>
+    </ion-buttons>
     <ion-buttons slot="end">
       <ion-button [(ngModel)]="paletteToggle" (click)="toggleChange()">
         <ion-icon name="sunny"></ion-icon>
@@ -11,29 +17,55 @@
 </ion-header>
 
 <ion-content>
-  <div class="home-page sky">
+  <div id="weatherBg" class="home-page">
+    <div class="rain-effect"></div>
     <div *ngIf="!weatherData" class="welcome-page">
-      <h1 class="title">Bienvenue sur Weather<span class="gradient">Now!</span></h1>
-      <p>Consultez les prévisions météo de votre ville préférée en un clic !</p>
-      <button (click)="searching = !searching">Click</button>
-      <div class="search-bar">
-        <input type="text" placeholder="Entrez le nom d'une ville" [(ngModel)]="city"
-          (keydown.enter)="searchWeather()" />
-        <button (click)="searchWeather()" [disabled]="searching" class="search-button">
-          <span *ngIf="!searching">Rechercher</span>
-          <span *ngIf="searching" class="spinner">
-            <ion-spinner name="crescent"></ion-spinner>
-          </span>
+      <div class="up-section">
+        <h1 class="title">Bienvenue sur Weather<span class="gradient">Now!</span></h1>
+        <p>Consultez les prévisions météo de votre ville préférée en un clic !</p>
+      </div>
+      <div class="down-section">
+        <div class="search-module">
+          <button (click)="getLocation()" class="geo-button">
+            <ion-icon name="navigate-outline"></ion-icon>
+          </button>
+          <div class="search-bar">
+            <input type="text" placeholder="Entrez le nom d'une ville" [(ngModel)]="city"
+              (keydown.enter)="searchWeather()" />
+            <button (click)="searchWeather()" [disabled]="searching" class="search-button">
+              <span *ngIf="!searching" class="button-label">
+                <ion-icon name="search-outline"></ion-icon>
+                <span>Rechercher</span>
+              </span>
+              <span *ngIf="searching" class="spinner">
+                <ion-spinner name="crescent"></ion-spinner>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <ion-list *ngIf="searchHistory.length > 0" class="search-history">
+          <ion-chip *ngFor="let city of searchHistory" (click)="selectCity(city)">
+            <ion-label>{{ city }}</ion-label>
+            <button class="delete-btn" (click)="removeCity($event, city)">
+              <ion-icon name="close"></ion-icon>
+            </button>
+          </ion-chip>
+        </ion-list>
+
+        <button class="clear-history" *ngIf="searchHistory.length > 0" (click)="clearHistory()">
+          <ion-label>Effacer l'historique</ion-label>
         </button>
       </div>
     </div>
+
 
     <div *ngIf="weatherData" class="weather-container">
       <div class="weather-title">
         <img [src]="'https://openweathermap.org/img/wn/' + weatherData.icon + '@4x.png'" [alt]="weatherData.description"
           class="weather-icon" />
         <span>
-          Météo pour {{ weatherData.name }}, {{ weatherData.country }}
+          {{ weatherData.name }}, {{ weatherData.country }}
         </span>
       </div>
 
@@ -93,15 +125,22 @@
       </div>
 
       <div class="sunrise-sunset">
-        <p><ion-icon name="sunny-outline"></ion-icon>Lever du soleil : {{ weatherData.sunrise * 1000 | date: 'HH:mm' }}
-          Coucher du soleil : {{ weatherData.sunset * 1000 | date: 'HH:mm' }}</p>
+        <div>
+          <ion-icon name="sunny"></ion-icon>
+          <ion-icon name="arrow-up"></ion-icon>
+          <span>{{ weatherData.sunrise * 1000 | date: 'HH:mm' }}</span>
+        </div>
+        <div>
+          <ion-icon name="sunny"></ion-icon>
+          <ion-icon name="arrow-down"></ion-icon>
+          <span>{{ weatherData.sunset * 1000 | date: 'HH:mm' }}</span>
+        </div>
       </div>
 
       <button class="toggle-unit" (click)="toggleUnit()">Basculer en degrés {{ unit === 'metric' ? 'Fahrenheit (F°)' :
         'Celsius (C°)'
         }}</button>
     </div>
-
     <div *ngIf="errorMessage" class="error">
       <p>{{ errorMessage }}</p>
     </div>

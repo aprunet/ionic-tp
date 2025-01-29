@@ -1,0 +1,165 @@
+$gradient-clear-day: linear-gradient(to top right,#87CEEB 70%, #F0E68C 90%, #ffe65c);
+$gradient-clear-night: linear-gradient(to bottom,#0D1B2A, #1B263B 60%, #2E3A4F 100%);
+
+$gradient-few-clouds-day: linear-gradient(to top right, #87CEEB 5%, #B0C4DE 70%, #F0E68C);
+$gradient-few-clouds-night: linear-gradient(to bottom, #1C2833 30%, #2C3E50 70%, #34495E 100%);
+
+$gradient-scattered-clouds-day: linear-gradient(to bottom, #D3D3D3 20%, #B0C4DE 70%, #87CEEB);
+$gradient-scattered-clouds-night: linear-gradient(to bottom, #2F3640, #353B48 70%, #4B4B4B);
+
+$gradient-broken-clouds-day: linear-gradient(to bottom, #A9A9A9 20%, #808080 70%, #B0C4DE);
+$gradient-broken-clouds-night: linear-gradient(to bottom, #1E272E, #3C3C3C 70%, #535C68);
+
+$gradient-rain-day: linear-gradient(to bottom, #778899 10%, #A9A9A9 50%, #708090);
+$gradient-rain-night: linear-gradient(to bottom, #2C3E50, #34495E 70%, #4B4B4B);
+
+$gradient-thunderstorm-day: linear-gradient(to bottom, #4C4C4C 10%, #696969 50%, #000000);
+$gradient-thunderstorm-night: linear-gradient(to bottom, #2C3E50, #0D0D0D 50%, #000000);
+
+$gradient-snow-day: linear-gradient(to bottom, #FFFFFF, #E0E0E0 50%, #D3D3D3);
+$gradient-snow-night: linear-gradient(to bottom, #B0C4DE, #A9A9A9 70%, #696969);
+
+$gradient-mist-day: linear-gradient(to bottom, #D3D3D3 10%, #A9A9A9 50%, #808080);
+$gradient-mist-night: linear-gradient(to bottom, #696969, #505050 70%, #2C2C2C);
+
+@keyframes flash {
+  0% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: .4;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: .4;
+  }
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-10vh);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh);
+    opacity: 0;
+  }
+}
+
+.clear-sky::after {
+  background: $gradient-clear-day;
+}
+
+.clear-sky.night::after {
+  background: $gradient-clear-night;
+}
+
+.few-clouds::after {
+  background: $gradient-few-clouds-day;
+}
+
+.few-clouds.night::after {
+  background: $gradient-few-clouds-night;
+}
+
+.scattered-clouds::after {
+  background: $gradient-scattered-clouds-day;
+}
+
+.scattered-clouds.night::after {
+  background: $gradient-scattered-clouds-night;
+}
+
+.broken-clouds::after {
+  background: $gradient-broken-clouds-day;
+}
+
+.broken-clouds.night::after {
+  background: $gradient-broken-clouds-night;
+}
+
+.shower-rain::after {
+  background: $gradient-rain-day;
+}
+
+.shower-rain.night::after {
+  background: $gradient-rain-night;
+}
+
+.rain::after {
+  background: $gradient-rain-day;
+}
+
+.rain.night::after {
+  background: $gradient-rain-night;
+}
+
+.thunderstorm::after {
+  background: $gradient-thunderstorm-day;
+}
+
+.thunderstorm.night::after {
+  background: $gradient-thunderstorm-night;
+}
+
+.snow::after {
+  background: $gradient-snow-day;
+}
+
+.snow.night::after {
+  background: $gradient-snow-night;
+}
+
+.mist::after {
+  background: $gradient-mist-day;
+}
+
+.mist.night::after {
+  background: $gradient-mist-night;
+}
+
+.rain-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 9;
+}
+
+.thunderstorm::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(255, 230, 88);
+  opacity: 0;
+  z-index: 8;
+  pointer-events: none;
+  animation: flash 0.2s ease-in-out infinite;
+}
+
+.thunderstorm.flash-active {
+  animation: flash 0.2s ease-in-out;
+}
+
+.raindrop {
+  position: absolute;
+  width: 2px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.6);
+  opacity: 0;
+  animation: fall 2s infinite ease-in-out, fade-in 0.2s ease-in forwards;
+}
