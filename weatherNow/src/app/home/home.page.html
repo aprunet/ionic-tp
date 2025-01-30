@@ -74,11 +74,14 @@
         <span>Température actuelle : {{ weatherData.temperature | number:
           '1.0-0' }}°{{unit === 'metric' ? 'C' : 'F'}}</span>
       </div>
-      <p class="feels-like">
+      <p *ngIf="!isMobile" class="feels-like">
         Ressenti : {{ weatherData.feels_like | number: '1.0-0' }}°{{unit === 'metric' ? 'C' : 'F'}}
       </p>
+      <button *ngIf="isMobile" class="toggle-unit" (click)="toggleUnit()">Basculer en degrés {{ unit === 'metric' ? 'Fahrenheit (F°)' :
+        'Celsius (C°)'
+        }}</button>
 
-      <div class="details">
+      <div *ngIf="!isMobile" class="details">
         <div class="card">
           <div class="label">Pluie (1h)</div>
           <div class="detail">
@@ -124,6 +127,38 @@
         </div>
       </div>
 
+      <div *ngIf="isMobile" class="details">
+        <div class="card">
+          <div class="label">
+            <ion-icon name="rainy-outline"></ion-icon>
+          </div>
+          <span>{{ weatherData.rain }} <span class="unit">mm</span></span>
+        </div>
+        <div class="card">
+          <div class="label">
+            <ion-icon name="leaf-outline"></ion-icon>
+          </div>
+          <span>{{ weatherData.wind.speed }} <span class="unit">{{unit === 'metric' ?
+              'm/s' : 'mph'}}</span></span>
+        </div>
+        <div class="card">
+          <div class="label"><ion-icon name="cloud-outline"></ion-icon></div>
+          <span>{{ weatherData.clouds }}<span class="unit">%</span></span>
+        </div>
+        <div class="card">
+          <div class="label"><ion-icon name="water-outline"></ion-icon></div>
+          <span>{{ weatherData.humidity }}<span class="unit">%</span></span>
+        </div>
+        <div class="card">
+          <div class="label"><ion-icon name="eye-outline"></ion-icon></div>
+          <span>{{ weatherData.visibility / 1000 }} <span class="unit">km</span></span>
+        </div>
+        <div class="card">
+          <div class="label"><ion-icon name="speedometer-outline"></ion-icon></div>
+          <span>{{ weatherData.pressure }} <span class="unit">hPa</span></span>
+        </div>
+      </div>
+
       <div class="sunrise-sunset">
         <div>
           <ion-icon name="sunny"></ion-icon>
@@ -137,7 +172,7 @@
         </div>
       </div>
 
-      <button class="toggle-unit" (click)="toggleUnit()">Basculer en degrés {{ unit === 'metric' ? 'Fahrenheit (F°)' :
+      <button *ngIf="!isMobile" class="toggle-unit" (click)="toggleUnit()">Basculer en degrés {{ unit === 'metric' ? 'Fahrenheit (F°)' :
         'Celsius (C°)'
         }}</button>
     </div>

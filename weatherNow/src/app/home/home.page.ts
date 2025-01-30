@@ -34,7 +34,7 @@ export class HomePage implements OnInit {
     private locationAccuracy: LocationAccuracy,
     private platform: Platform
   ) {
-    this.isMobile = this.platform.is('cordova') || this.platform.is('capacitor');
+    this.isMobile = this.platform.is('cordova') || this.platform.is('capacitor') || window.matchMedia("(max-width: 768px)").matches;
   }
 
   async ngOnInit() {

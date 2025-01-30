@@ -108,7 +108,7 @@ $geoloc-color: #007BFF;
     flex-direction: column;
     align-items: center;
     gap: 1.5rem;
-    padding-top: 20vh;
+    padding-top: 15vh;
 
     & p {
       text-shadow: 2px 2px 10px $text-shadow-color;
@@ -313,13 +313,13 @@ $geoloc-color: #007BFF;
         align-content: center;
         border-radius: 50%;
         transition: background-color 0.3s ease;
-  
+
         ion-icon {
           font-size: 1rem;
           padding: 2px;
           color: #000
         }
-  
+
         &:hover {
           background-color: lightgray;
         }
@@ -363,7 +363,7 @@ $geoloc-color: #007BFF;
   color: white;
   max-width: 1200px;
   height: calc(100vh - 60px);
-  margin: 150px auto;
+  margin: 0 auto;
 
   .weather-title {
     display: flex;
@@ -426,7 +426,7 @@ $geoloc-color: #007BFF;
       border-top-right-radius: 12px;
       border-bottom-left-radius: 2px;
       border-bottom-right-radius: 2px;
-      padding: 0.5rem 1rem;
+      padding: .25rem 1rem;
     }
 
     .detail {
@@ -504,9 +504,10 @@ $geoloc-color: #007BFF;
     max-width: unset;
     width: 100%;
     max-height: calc(100vh - 44px);
+    justify-content: flex-start;
 
     .weather-title span {
-      font-size: 2rem;
+      font-size: 1.5rem;
       padding: 0.5rem 1rem;
     }
 
@@ -521,20 +522,33 @@ $geoloc-color: #007BFF;
 
     .details {
       gap: 1rem;
-      display: flex;
-      flex-direction: row;
-      align-items: stretch;
-      justify-content: flex-start;
-      flex-wrap: wrap;
-      overflow-y: auto;
-      max-width: 100%;
-      scroll-snap-type: y proximity;
-      padding: 15px 0;
-
       .card {
-        flex: 0 0 90vw;
-        scroll-snap-align: start;
-        padding: 0 5px;
+        aspect-ratio: 1/.6;
+        width: 45%;
+        height: auto;
+
+        ion-icon {
+          font-size: 1.75rem;
+        }
+
+        &>span {
+          background: rgba(255, 255, 255, 0.2);
+          padding: 0.8rem;
+          border-top-left-radius: 2px;
+          border-top-right-radius: 2px;
+          border-bottom-left-radius: 12px;
+          border-bottom-right-radius: 12px;
+          text-align: center;
+          font-size: 2rem;
+          font-weight: bold;
+          color: #ffffff;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+
+          &>.unit {
+            font-size: 1rem;
+          }
+        }
       }
     }
 
