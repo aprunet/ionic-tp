@@ -16,7 +16,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content [fullscreen]="true" class="ion-padding">
   <div id="weatherBg" class="home-page">
     <div class="rain-effect"></div>
     <div *ngIf="!weatherData" class="welcome-page">
@@ -26,12 +26,12 @@
       </div>
       <div class="down-section">
         <div class="search-module">
-          <button (click)="getLocation()" class="geo-button">
+          <button (click)="getLocation()" [disabled]="searching" class="geo-button">
             <ion-icon name="navigate-outline"></ion-icon>
           </button>
           <div class="search-bar">
             <input type="text" placeholder="Entrez le nom d'une ville" [(ngModel)]="city"
-              (keydown.enter)="searchWeather()" />
+              (keydown.enter)="searchWeather()" [disabled]="searching"/>
             <button (click)="searchWeather()" [disabled]="searching" class="search-button">
               <span *ngIf="!searching" class="button-label">
                 <ion-icon name="search-outline"></ion-icon>
@@ -44,18 +44,18 @@
           </div>
         </div>
 
-        <ion-list *ngIf="searchHistory.length > 0" class="search-history">
-          <ion-chip *ngFor="let city of searchHistory" (click)="selectCity(city)">
+        <ion-list *ngIf="searchHistory.length > 0" class="search-history {{searching ? 'hidden' : ''}}">
+          <ion-chip *ngFor="let city of searchHistory" (click)="selectCity(city)" [disabled]="searching" color="light">
             <ion-label>{{ city }}</ion-label>
-            <button class="delete-btn" (click)="removeCity($event, city)">
+            <button class="delete-btn" (click)="removeCity($event, city)" [disabled]="searching">
               <ion-icon name="close"></ion-icon>
             </button>
           </ion-chip>
         </ion-list>
 
-        <button class="clear-history" *ngIf="searchHistory.length > 0" (click)="clearHistory()">
+        <ion-button class="clear-history {{searching ? 'hidden' : ''}}" *ngIf="searchHistory.length > 0" (click)="clearHistory()" [disabled]="searching">
           <ion-label>Effacer l'historique</ion-label>
-        </button>
+        </ion-button>
       </div>
     </div>
 
@@ -141,9 +141,7 @@
         'Celsius (C°)'
         }}</button>
     </div>
-    <div *ngIf="errorMessage" class="error">
-      <p>{{ errorMessage }}</p>
-    </div>
+    <ion-toast [isOpen]="!!errorMessage" message="{{errorMessage}}" [duration]="3000" icon="alert-outline" (didDismiss)="errorMessage = ''"></ion-toast>
   </div>
 
 </ion-content>

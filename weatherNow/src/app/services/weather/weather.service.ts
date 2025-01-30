@@ -19,7 +19,7 @@ export class WeatherService {
     return this.http.get<any>(url).pipe(
       map((data) => this.formatWeatherData(data))
     );
-  }  
+  }
 
   private formatWeatherData(data: any) {
     return {
