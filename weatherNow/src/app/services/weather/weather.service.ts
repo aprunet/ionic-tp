@@ -1,19 +1,21 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class WeatherService {
-  private apiKey: string = 'd86340f4165f2b8674f98652be4efc9e';
-  private apiUrl: string = 'https://api.openweathermap.org/data/2.5';
+  private apiUrl: string = environment.apiUrl;
+  private apiKey: string = environment.apiKey;
 
   private thunderstormTimerId: number | null = null;
 
   constructor(private http: HttpClient) { }
 
+  /** Récupère les données météo par coordonnées GPS */
   getWeatherByCoords(lat: number, lon: number, unit: 'metric' | 'imperial') {
     const url = `${this.apiUrl}/weather?lat=${lat}&lon=${lon}&units=${unit}&appid=${this.apiKey}`;
     return this.http.get<any>(url).pipe(
@@ -21,6 +23,23 @@ export class WeatherService {
     );
   }
 
+  /** Récupère les données météo par nom de ville */
+  getWeather(city: string, units: 'metric' | 'imperial'): Observable<any> {
+    const url = `${this.apiUrl}/weather`;
+    const params = {
+      q: city,
+      appid: this.apiKey,
+      units,
+    };
+
+    return this.http.get(url, { params }).pipe(
+      map((response: any) => {
+        return this.formatWeatherData(response);
+      })
+    );
+  }
+
+  /** Formate les données météo pour l'affichage */
   private formatWeatherData(data: any) {
     return {
       name: data.name,
@@ -42,23 +61,8 @@ export class WeatherService {
       description: data.weather[0].description,
     };
   }
-  
 
-  getWeather(city: string, units: 'metric' | 'imperial'): Observable<any> {
-    const url = `${this.apiUrl}/weather`;
-    const params = {
-      q: city,
-      appid: this.apiKey,
-      units,
-    };
-
-    return this.http.get(url, { params }).pipe(
-      map((response: any) => {
-        return this.formatWeatherData(response);
-      })
-    );
-  }
-
+  /** Active l'effet de pluie sur l'interface */
   createRainEffect(): void {
     console.warn("creating rain effect");
     const rainEffect = document.querySelector('.rain-effect');
@@ -82,6 +86,7 @@ export class WeatherService {
     }
   }
 
+  /** Désactive l'effet de pluie */
   stopRainEffect(): void {
     const rainEffect = document.querySelector('.rain-effect');
     if (!rainEffect) {
@@ -94,6 +99,7 @@ export class WeatherService {
     }
   }
 
+  /** Active l'effet d'orage aléatoire */
   enableThunderstormEffect(): void {
     const thunderstormElem = document.querySelector('.thunderstorm');
   
@@ -117,7 +123,7 @@ export class WeatherService {
     }
   }
   
-
+  /** Désactive l'effet d'orage */
   disableThunderstormEffect(): void {
     if (this.thunderstormTimerId !== null) {
       clearTimeout(this.thunderstormTimerId);

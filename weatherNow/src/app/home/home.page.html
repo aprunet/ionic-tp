@@ -17,22 +17,25 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
-  <div id="weatherBg" class="home-page">
+  <!--Conteneur page principale-->
+  <div id="weatherBg" class="main-page">
     <div class="rain-effect"></div>
+
+    <!--Page d'accueil-->
     <div *ngIf="!weatherData" class="welcome-page">
       <div class="up-section">
         <h1 class="title">Bienvenue sur Weather<span class="gradient">Now!</span></h1>
         <p>Consultez les prévisions météo de votre ville préférée en un clic !</p>
       </div>
       <div class="down-section">
+        <!--Barre de recherche-->
         <div class="search-module">
           <button (click)="getLocation()" [disabled]="searching" class="geo-button">
             <ion-icon name="navigate-outline"></ion-icon>
           </button>
-          <div class="search-bar">
-            <input type="text" placeholder="Entrez le nom d'une ville" [(ngModel)]="city"
-              (keydown.enter)="searchWeather()" [disabled]="searching"/>
-            <button (click)="searchWeather()" [disabled]="searching" class="search-button">
+          <form (submit)="getWeather()" class="search-bar">
+            <input type="text" placeholder="Entrez le nom d'une ville" [(ngModel)]="city" name="city" [disabled]="searching"/>
+            <button class="search-button" type="submit" [disabled]="searching" >
               <span *ngIf="!searching" class="button-label">
                 <ion-icon name="search-outline"></ion-icon>
                 <span>Rechercher</span>
@@ -41,9 +44,10 @@
                 <ion-spinner name="crescent"></ion-spinner>
               </span>
             </button>
-          </div>
+          </form>
         </div>
 
+        <!--Historique des villes consultées-->
         <ion-list *ngIf="searchHistory.length > 0" class="search-history {{searching ? 'hidden' : ''}}">
           <ion-chip *ngFor="let city of searchHistory" (click)="selectCity(city)" [disabled]="searching" color="light">
             <ion-label>{{ city }}</ion-label>
@@ -59,7 +63,7 @@
       </div>
     </div>
 
-
+    <!--Page météo-->
     <div *ngIf="weatherData" class="weather-container">
       <div class="weather-title">
         <img [src]="'https://openweathermap.org/img/wn/' + weatherData.icon + '@4x.png'" [alt]="weatherData.description"
@@ -74,6 +78,8 @@
         <span>Température actuelle : {{ weatherData.temperature | number:
           '1.0-0' }}°{{unit === 'metric' ? 'C' : 'F'}}</span>
       </div>
+
+      <!--Affichage différent selon la plateforme (mobile ou non)-->
       <p *ngIf="!isMobile" class="feels-like">
         Ressenti : {{ weatherData.feels_like | number: '1.0-0' }}°{{unit === 'metric' ? 'C' : 'F'}}
       </p>
@@ -176,7 +182,8 @@
         'Celsius (C°)'
         }}</button>
     </div>
+
+    <!--Toaster d'erreur-->
     <ion-toast [isOpen]="!!errorMessage" message="{{errorMessage}}" [duration]="3000" icon="alert-outline" (didDismiss)="errorMessage = ''"></ion-toast>
   </div>
-
 </ion-content>

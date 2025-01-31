@@ -54,7 +54,7 @@ $geoloc-color: #007BFF;
   color: transparent;
 }
 
-.home-page {
+.main-page {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -213,7 +213,7 @@ $geoloc-color: #007BFF;
       padding: 16px 21px;
       font-size: 1rem;
       font-weight: bold;
-      transition: width 0.3s ease;
+      transition: width 0.3s ease, filter 0.3s ease;
 
       &:hover:not(:disabled) {
         filter: brightness(1.25);

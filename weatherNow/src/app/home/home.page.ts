@@ -34,36 +34,42 @@ export class HomePage implements OnInit {
     private locationAccuracy: LocationAccuracy,
     private platform: Platform
   ) {
+    // Détection de la plateforme mobile ou desktop
     this.isMobile = this.platform.is('cordova') || this.platform.is('capacitor') || window.matchMedia("(max-width: 768px)").matches;
   }
 
   async ngOnInit() {
+    // Light/dark mode et récupération de l'historique de recherches
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
     this.initializeDarkPalette(prefersDark.matches);
     prefersDark.addEventListener('change', (mediaQuery) => this.initializeDarkPalette(mediaQuery.matches));
     this.searchHistory = await this.historyService.getHistory();
   }
 
+  //Gestion light/dark mode (doc Ionic)
+  /** Applique l'affichage du mode sombre selon la préférence utilisateur */
+  initializeDarkPalette(isDark: boolean) {
+    this.paletteToggle = isDark;
+    this.toggleDarkPalette(isDark);
+  }
+  /** Active/désactive le mode sombre */
+  toggleChange() {
+    this.paletteToggle = !this.paletteToggle;
+    this.toggleDarkPalette(this.paletteToggle);
+  }
+  /** Applique la classe CSS pour le mode sombre */
+  toggleDarkPalette(shouldAdd: boolean) {
+    document.documentElement.classList.toggle('ion-palette-dark', shouldAdd);
+  }
+
+  /** Formate le pays reçu (FR -> France) */
   processCountry(data: { country: string }) {
     return data.country.replace(/(\w{2})/g, (match: any, countryCode: string) => {
       return ` ${flags[countryCode] || countryCode}`;
     });
   }
 
-  initializeDarkPalette(isDark: boolean) {
-    this.paletteToggle = isDark;
-    this.toggleDarkPalette(isDark);
-  }
-
-  toggleChange() {
-    this.paletteToggle = !this.paletteToggle;
-    this.toggleDarkPalette(this.paletteToggle);
-  }
-
-  toggleDarkPalette(shouldAdd: boolean) {
-    document.documentElement.classList.toggle('ion-palette-dark', shouldAdd);
-  }
-
+  /** Applique le fond météorologique correspondant aux conditions */
   setWeatherBackground(data: any) {
     const backgroundElem = document.getElementById('weatherBg');
     backgroundElem
@@ -78,26 +84,27 @@ export class HomePage implements OnInit {
       }) : console.warn("backgroundElem not found");
   }
 
-  async searchWeather() {
+  /** Effectue la recherche météo d'une ville */
+  async getWeather() {
     this.loading = true;
     this.searching = true;
 
+    //Si la barre de recherche a été remplie on appelle la méthode du weatherService pour requêter l'api
     if (this.city.trim()) {
       this.weatherService.getWeather(this.city, this.unit).subscribe({
         next: async (data) => {
+          //Réponse positive de l'api on traite la data reçue et on l'affiche à l'utilisateur
           this.searching = false;
           data.country = this.processCountry({ country: data.country });
           this.weatherData = data;
           this.city = data.name;
           this.setWeatherBackground(data);
           this.errorMessage = '';
-
           await this.historyService.addToHistory(this.city);
           this.searchHistory = await this.historyService.getHistory();
-
-          console.log('Données météo :', data);
         },
         error: (err) => {
+          //Réponse négative affichage de l'erreur
           this.searching = false;
           this.weatherData = null;
           err.message = err.message.includes('404') ? 'La ville spécifiée est introuvable, veuillez réessayer.' : err.message;
@@ -106,6 +113,7 @@ export class HomePage implements OnInit {
         },
       });
     } else {
+      //Sécurité si recherche demandée alors que la barre de recherche est vide
       this.searching = false;
       alert('Veuillez entrer le nom d\'une ville.');
     }
@@ -113,31 +121,35 @@ export class HomePage implements OnInit {
     this.loading = false;
   }
 
+  /** Sélectionne une ville depuis l'historique */
   selectCity(cityName: string) {
     this.city = cityName;
-    this.searchWeather();
+    this.getWeather();
   }
 
-
+  /** Efface complètement l'historique des recherches */
   async clearHistory() {
     await this.historyService.clearHistory();
     this.searchHistory = [];
   }
 
+  /** Supprime une ville spécifique de l'historique */
   async removeCity(event: MouseEvent, city: string) {
     event.stopPropagation();
     await this.historyService.removeFromHistory(city);
     this.searchHistory = await this.historyService.getHistory();
   }
 
+  /** Bascule entre Celsius et Fahrenheit */
   toggleUnit() {
     this.unit = this.unit === 'metric' ? 'imperial' : 'metric';
     if (this.city.trim()) {
-      this.searchWeather();
+      this.getWeather();
     }
   }
 
-  async getLocation(retry = false) {
+  /** Récupère la localisation GPS (mobile) */
+  async getLocation() {
     this.searching = true;
 
     try {
@@ -160,7 +172,7 @@ export class HomePage implements OnInit {
           throw new Error("Position introuvable.");
 
         console.log(`Localisation récupérée : ${position.coords.latitude}, ${position.coords.longitude} (précision : ${position.coords.accuracy}m)`);
-        this.handleLocationSuccess(position.coords.latitude, position.coords.longitude);
+        this.handleLocationSuccessAndGetWeather(position.coords.latitude, position.coords.longitude);
       } else {
         this.getLocationWeb();
       }
@@ -172,7 +184,7 @@ export class HomePage implements OnInit {
     }
   }
 
-
+  /** Récupère la localisation GPS (desktop) */
   getLocationWeb() {
     if (!navigator.geolocation) {
       alert("La géolocalisation n'est pas prise en charge par votre navigateur.");
@@ -182,7 +194,7 @@ export class HomePage implements OnInit {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        this.handleLocationSuccess(position.coords.latitude, position.coords.longitude);
+        this.handleLocationSuccessAndGetWeather(position.coords.latitude, position.coords.longitude);
       },
       (error) => {
         this.searching = false;
@@ -192,6 +204,7 @@ export class HomePage implements OnInit {
     );
   }
 
+  /** Vérifie et demande les permissions de localisation (précise ou approximative) */
   async checkPermissions(): Promise<'fine' | 'coarse' | 'denied'> {
     try {
       const fineLocation = await this.androidPermissions.checkPermission(
@@ -226,6 +239,8 @@ export class HomePage implements OnInit {
     }
   }
 
+  //Suggestion IA
+  /** Assure une meilleure précision GPS */
   async ensureLocationAccuracy(): Promise<void> {
     try {
       const canRequest = await this.locationAccuracy.canRequest();
@@ -238,7 +253,8 @@ export class HomePage implements OnInit {
     }
   }
 
-  handleLocationSuccess(latitude: number, longitude: number) {
+  /** Effectue la recherche météo d'une ville après obtention de la position */
+  handleLocationSuccessAndGetWeather(latitude: number, longitude: number) {
     console.log(`Localisation récupérée : ${latitude}, ${longitude}`);
 
     this.weatherService.getWeatherByCoords(latitude, longitude, this.unit).subscribe({
@@ -269,6 +285,7 @@ export class HomePage implements OnInit {
   }
 
 
+  /** Réinitialise l'affichage et retourne à la page d'accueil */
   goBackToHomePage() {
     this.city = '';
     this.weatherData = null;
